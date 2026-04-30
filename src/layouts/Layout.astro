@@ -1,0 +1,47 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = "BGKPJR Stage 1 — Electromagnetic Launch Tube Deep Dive" } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="https://thebardchat.github.io/assets/social-card.jpg" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      :root {
+        --cyan: #00e5ff;
+        --purple: #7c3aed;
+        --amber: #ffaa00;
+        --bg: #030810;
+        --bg2: #060f1e;
+        --border: #0d2040;
+      }
+      html { scroll-behavior: smooth; }
+      body {
+        background: var(--bg);
+        color: #c8d8ea;
+        font-family: "JetBrains Mono", monospace;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+      a { color: var(--cyan); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

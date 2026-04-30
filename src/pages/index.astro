@@ -1,0 +1,697 @@
+---
+import Layout from "../layouts/Layout.astro";
+import TubeCrossSection from "../islands/TubeCrossSection.svelte";
+import { TUBE, SEAL, NOSE, ENERGY } from "../data/tube.ts";
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="BGKPJR · Stage 1 — EM Launch Tube" description="Deep dive into the 28.7 km electromagnetic launch tube. Coilgun architecture, muzzle seal, and Manna Penetrator Type 1 nose cone.">
+
+  <nav>
+    <a href="https://thebardchat.github.io/BGKPJR-Launch-Vis/" class="nav-back">← Full Launch Visualizer</a>
+    <span class="nav-title">BGKPJR · STAGE 1</span>
+    <a href="https://github.com/thebardchat/BGKPJR-Stage1-Tube" class="nav-gh">GitHub ↗</a>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <div class="hero-badge">STAGE 1 · DEEP DIVE</div>
+    <h1>Electromagnetic<br /><span class="cyan">Launch Tube</span></h1>
+    <p class="hero-sub">
+      28.7 km of superconducting coilgun. Ground-based. Evacuated. Reusable.<br />
+      Replaces the first stage of every rocket ever built.
+    </p>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-val cyan">{TUBE.lengthKm} km</span>
+        <span class="stat-label">TUBE LENGTH</span>
+      </div>
+      <div class="stat">
+        <span class="stat-val">Mach {TUBE.exitSpeedMach}</span>
+        <span class="stat-label">EXIT VELOCITY</span>
+      </div>
+      <div class="stat">
+        <span class="stat-val amber">{TUBE.transitSec}s</span>
+        <span class="stat-label">TRANSIT TIME</span>
+      </div>
+      <div class="stat">
+        <span class="stat-val">{TUBE.coilTemp}</span>
+        <span class="stat-label">COIL TEMPERATURE</span>
+      </div>
+      <div class="stat">
+        <span class="stat-val cyan">{TUBE.coilField}</span>
+        <span class="stat-label">PEAK FIELD</span>
+      </div>
+      <div class="stat">
+        <span class="stat-val amber">{ENERGY.storedMJ} MJ</span>
+        <span class="stat-label">STORED ENERGY</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── 3D VISUALIZATION ── -->
+  <section class="viz-section">
+    <div class="section-label">LIVE SIMULATION · REAL-TIME COIL FIRING SEQUENCE</div>
+    <TubeCrossSection client:only="svelte" />
+    <p class="viz-caption">
+      Semi-transparent barrel wall reveals {TUBE.coilCount.toLocaleString()} NbTi superconducting coil rings.
+      Leading coils pull the pod forward; trailing coils de-energize instantly to prevent back-pull.
+      Blue field line arcs represent the switching magnetic flux pattern.
+    </p>
+  </section>
+
+  <!-- ── ARCHITECTURE BREAKDOWN ── -->
+  <section class="arch-section">
+    <h2 class="section-title">How It Works</h2>
+    <div class="arch-grid">
+
+      <div class="arch-card">
+        <div class="arch-icon cyan-glow">⚡</div>
+        <h3>Coilgun Principle</h3>
+        <p>Unlike a railgun (which uses sliding electrical contact and destroys itself), a coilgun uses pulsed electromagnetic induction. Each NbTi coil is energized briefly as the pod approaches, then switched off the moment the pod passes — eliminating back-pull drag. No physical contact. No wear.</p>
+        <div class="arch-spec">
+          <span>{TUBE.coilCount.toLocaleString()} coils · {ENERGY.coilSwitchingUs} μs switching window</span>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <div class="arch-icon cyan-glow">🧲</div>
+        <h3>NbTi Superconducting Coils</h3>
+        <p>Niobium-titanium wound at 4.2 K (liquid helium temperature) achieves zero electrical resistance. The {TUBE.coilField} peak field threads through the pod's superconducting armature, coupling kinetic energy directly. Cryogenic infrastructure draws {ENERGY.cryoSystemKW} kW — amortized across daily launches.</p>
+        <div class="arch-spec">
+          <span>{TUBE.coilMaterial} · {TUBE.coilTemp} · {TUBE.coilField}</span>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <div class="arch-icon amber-glow">🌬️</div>
+        <h3>Evacuated Bore</h3>
+        <p>The {TUBE.boreDiameterM} m diameter bore is pumped to {TUBE.vacuumAtm} atm — eliminating aerodynamic drag for the full {TUBE.lengthKm} km acceleration run. At Mach 3.5, a 0.001 atm residual pressure creates negligible drag. The seal at the muzzle maintains vacuum until the millisecond of exit.</p>
+        <div class="arch-spec">
+          <span>{TUBE.vacuumAtm} atm · {TUBE.boreDiameterM} m bore · {TUBE.outerDiameterM} m OD</span>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <div class="arch-icon amber-glow">📐</div>
+        <h3>15° Elevation Angle</h3>
+        <p>The tube is inclined at {TUBE.elevationDeg}° — steep enough to clear the atmosphere efficiently, shallow enough to keep the muzzle elevation manageable. The pod exits into thinning air at ~4 km altitude, where the Gryphon Wing deploys to continue acceleration using the atmosphere as free propellant.</p>
+        <div class="arch-spec">
+          <span>{TUBE.elevationDeg}° incline · {TUBE.accelGs}g peak acceleration · {TUBE.exitSpeedMach} Mach exit</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── ENERGY TIMELINE ── -->
+  <section class="timeline-section">
+    <h2 class="section-title">900 MJ in {TUBE.transitSec} Seconds</h2>
+    <p class="section-sub">Complete firing sequence — from pre-charge to seal rupture</p>
+    <div class="timeline">
+      {ENERGY.stages.map((s, i) => (
+        <div class="tl-item">
+          <div class="tl-dot" class:last={i === ENERGY.stages.length - 1}></div>
+          <div class="tl-line" style={i === ENERGY.stages.length - 1 ? "opacity:0" : ""}></div>
+          <div class="tl-content">
+            <span class="tl-time">{s.label}</span>
+            <span class="tl-event">{s.event}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+    <div class="energy-bar-wrap">
+      <div class="energy-bar-label">ENERGY RELEASE PROFILE — {ENERGY.storedMJ} MJ · {ENERGY.peakPowerGW} GW peak · {TUBE.transitSec}s window</div>
+      <div class="energy-bar-outer">
+        <div class="energy-bar-inner"></div>
+        <div class="energy-bar-peak"></div>
+      </div>
+      <div class="energy-bar-ticks">
+        <span>T+0</span><span>T+6s</span><span>T+12s</span><span>T+18s</span><span>T+23s</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MUZZLE SEAL ── -->
+  <section class="seal-section">
+    <h2 class="section-title">The Muzzle Seal</h2>
+    <p class="section-sub">{SEAL.name}</p>
+    <div class="seal-grid">
+      <div class="seal-diagram">
+        <div class="seal-vis">
+          {SEAL.layers.map((layer, i) => (
+            <div class="seal-layer" style={`background: ${layer.color}; opacity: ${0.9 - i * 0.15};`}>
+              <span class="sl-name">{layer.name}</span>
+              <span class="sl-thick">{layer.thickness}</span>
+            </div>
+          ))}
+          <div class="seal-arrow">→ BORE (vacuum side)</div>
+        </div>
+      </div>
+      <div class="seal-info">
+        <div class="seal-cards">
+          {SEAL.layers.map(layer => (
+            <div class="seal-card">
+              <div class="seal-dot" style={`background: ${layer.color}; border: 1px solid #334455;`}></div>
+              <div>
+                <div class="seal-card-name">{layer.name}</div>
+                <div class="seal-card-role">{layer.role}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div class="seal-stat-row">
+          <div class="seal-stat">
+            <span class="ss-val amber">{SEAL.burnTimeUs} μs</span>
+            <span class="ss-label">SELF-DESTRUCT TIME</span>
+          </div>
+          <div class="seal-stat">
+            <span class="ss-val">{SEAL.rupturePressurePa.toLocaleString()} Pa</span>
+            <span class="ss-label">RUPTURE THRESHOLD</span>
+          </div>
+          <div class="seal-stat">
+            <span class="ss-val cyan">ZERO DEBRIS</span>
+            <span class="ss-label">THERMITE BURNS CLEAN</span>
+          </div>
+        </div>
+        <div class="seal-note">
+          The WC tip of the incoming pod contacts the CF diaphragm at Mach 3.5. The impact shockwave initiates the thermite layer — which consumes itself completely in under 50 microseconds. No debris enters the atmosphere. No contamination of the pod's aerodynamic envelope.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── NOSE CONE ── -->
+  <section class="nose-section">
+    <h2 class="section-title">Nose Cone Architecture</h2>
+    <p class="section-sub">{NOSE.designName} — 5-layer penetrator stack</p>
+    <div class="nose-grid">
+      <div class="nose-layers-vis">
+        {NOSE.layers.map((layer, i) => (
+          <div class="nl-row" style={`animation-delay: ${i * 0.12}s`}>
+            <div class="nl-color" style={`background: ${layer.color};`}></div>
+            <div class="nl-bar" style={`width: ${100 - i * 15}%; background: ${layer.color}44; border-left: 3px solid ${layer.color};`}>
+              <span class="nl-name">{layer.name}</span>
+              <span class="nl-thick">{layer.thickness}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="nose-cards">
+        {NOSE.layers.map(layer => (
+          <div class="nose-card">
+            <div class="nc-dot" style={`background: ${layer.color}; border: 1px solid #445566;`}></div>
+            <div>
+              <div class="nc-name">{layer.name}</div>
+              <div class="nc-role">{layer.role}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    <div class="nose-note">
+      The penetrator tip sequence is engineered specifically for the exit event: WC-Co absorbs the initial impact with the seal membrane, SiC shapes the hypersonic shockwave, C/C ablates any residual blast heating, Duocel foam distributes deceleration loads across internal payload, and the Ti collar provides structural continuity to the main body.
+    </div>
+  </section>
+
+  <!-- ── SYSTEM SPECS ── -->
+  <section class="specs-section">
+    <h2 class="section-title">Full System Specifications</h2>
+    <div class="specs-table">
+      <div class="spec-row"><span>Tube Length</span><span class="cyan">{TUBE.lengthKm} km</span></div>
+      <div class="spec-row"><span>Bore Diameter</span><span>{TUBE.boreDiameterM} m (inner evacuated)</span></div>
+      <div class="spec-row"><span>Outer Diameter</span><span>{TUBE.outerDiameterM} m (structural shell)</span></div>
+      <div class="spec-row"><span>Coil Count</span><span>{TUBE.coilCount.toLocaleString()} NbTi rings</span></div>
+      <div class="spec-row"><span>Coil Material</span><span>{TUBE.coilMaterial}</span></div>
+      <div class="spec-row"><span>Operating Temperature</span><span class="cyan">{TUBE.coilTemp}</span></div>
+      <div class="spec-row"><span>Peak Magnetic Field</span><span>{TUBE.coilField}</span></div>
+      <div class="spec-row"><span>Bore Pressure</span><span>{TUBE.vacuumAtm} atm ({(TUBE.vacuumAtm * 101325).toFixed(0)} Pa)</span></div>
+      <div class="spec-row"><span>Elevation Angle</span><span>{TUBE.elevationDeg}°</span></div>
+      <div class="spec-row"><span>Peak Acceleration</span><span class="amber">{TUBE.accelGs}g</span></div>
+      <div class="spec-row"><span>Exit Speed</span><span>Mach {TUBE.exitSpeedMach} · 4,287 km/h</span></div>
+      <div class="spec-row"><span>Transit Time</span><span>{TUBE.transitSec} seconds</span></div>
+      <div class="spec-row"><span>Stored Energy</span><span class="amber">{ENERGY.storedMJ} MJ</span></div>
+      <div class="spec-row"><span>Peak Power</span><span>{ENERGY.peakPowerGW} GW (during discharge)</span></div>
+      <div class="spec-row"><span>Coil Switching Window</span><span>{ENERGY.coilSwitchingUs} μs per coil</span></div>
+      <div class="spec-row"><span>Cryo System Draw</span><span>{ENERGY.cryoSystemKW} kW continuous</span></div>
+      <div class="spec-row"><span>Charge Time</span><span>{ENERGY.chargeTimeSec}s ({(ENERGY.chargeTimeSec / 60).toFixed(0)} min) per launch</span></div>
+      <div class="spec-row"><span>Seal Design</span><span>{SEAL.name}</span></div>
+      <div class="spec-row"><span>Seal Burn Time</span><span>&lt; {SEAL.burnTimeUs} μs · zero debris</span></div>
+      <div class="spec-row"><span>Nose Design</span><span>{NOSE.designName}</span></div>
+    </div>
+  </section>
+
+  <!-- ── BACK NAV ── -->
+  <section class="back-nav">
+    <div class="back-grid">
+      <a href="https://thebardchat.github.io/BGKPJR-Launch-Vis/" class="back-card">
+        <span class="back-icon">🚀</span>
+        <div>
+          <div class="back-label">← Full Launch Visualizer</div>
+          <div class="back-sub">All 3 stages · Three.js animation</div>
+        </div>
+      </a>
+      <a href="https://thebardchat.github.io/manna-pods/" class="back-card">
+        <span class="back-icon">🛸</span>
+        <div>
+          <div class="back-label">Manna Pod Concepts →</div>
+          <div class="back-sub">7 pod variants · full specs + 3D cross-sections</div>
+        </div>
+      </a>
+      <a href="https://github.com/thebardchat/BGKPJR-Core-Simulations" class="back-card">
+        <span class="back-icon">⚙️</span>
+        <div>
+          <div class="back-label">Physics Engine →</div>
+          <div class="back-sub">Trajectory · GNC · thermal · Monte Carlo</div>
+        </div>
+      </a>
+    </div>
+    <div class="footer-note">
+      Built by Shane Brazelton + Claude (Anthropic) · Hazel Green, Alabama · 2026<br />
+      <a href="https://claude.ai/referral/4fAMYN9Ing">Try Claude free →</a>
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+/* ── NAV ── */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(3,8,16,.92);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-back, .nav-gh { font-size: 11px; letter-spacing: .08em; color: #446688; }
+.nav-back:hover, .nav-gh:hover { color: var(--cyan); text-decoration: none; }
+.nav-title {
+  font-size: 11px;
+  letter-spacing: .25em;
+  color: #334466;
+  font-weight: 700;
+}
+
+/* ── HERO ── */
+.hero {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px 32px 48px;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: .25em;
+  color: var(--cyan);
+  border: 1px solid #00e5ff44;
+  border-radius: 4px;
+  padding: 4px 12px;
+  margin-bottom: 24px;
+}
+h1 {
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  font-weight: 700;
+  color: #e8f4ff;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+.cyan { color: var(--cyan); }
+.amber { color: var(--amber); }
+.cyan-glow { text-shadow: 0 0 20px var(--cyan); }
+.amber-glow { text-shadow: 0 0 20px var(--amber); }
+
+.hero-sub {
+  font-size: 14px;
+  color: #5a7a9a;
+  line-height: 1.7;
+  max-width: 680px;
+  margin: 0 auto 40px;
+}
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.stat {
+  background: var(--bg2);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.stat-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: #d0e8ff;
+}
+.stat-val.cyan { color: var(--cyan); }
+.stat-val.amber { color: var(--amber); }
+.stat-label {
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: #2a4060;
+}
+
+/* ── VIZ SECTION ── */
+.viz-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 32px 64px;
+}
+.section-label {
+  font-size: 9px;
+  letter-spacing: .2em;
+  color: #1a3050;
+  margin-bottom: 12px;
+}
+.viz-caption {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #2a4060;
+  line-height: 1.7;
+  max-width: 800px;
+}
+
+/* ── ARCH SECTION ── */
+.arch-section, .timeline-section, .seal-section, .nose-section, .specs-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 64px 32px;
+  border-top: 1px solid var(--border);
+}
+.section-title {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 700;
+  color: #c8ddf0;
+  margin-bottom: 8px;
+}
+.section-sub {
+  font-size: 12px;
+  color: #334466;
+  margin-bottom: 32px;
+  letter-spacing: .05em;
+}
+.arch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.arch-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color .2s;
+}
+.arch-card:hover { border-color: #1a3a5c; }
+.arch-icon { font-size: 28px; }
+.arch-card h3 { font-size: 13px; color: #a8c8e8; letter-spacing: .04em; }
+.arch-card p { font-size: 12px; color: #446688; line-height: 1.7; flex: 1; }
+.arch-spec {
+  font-size: 10px;
+  color: #1a3050;
+  letter-spacing: .08em;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+/* ── TIMELINE ── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 40px;
+  max-width: 640px;
+}
+.tl-item {
+  display: grid;
+  grid-template-columns: 14px 14px 1fr;
+  gap: 0 14px;
+  align-items: start;
+  min-height: 48px;
+}
+.tl-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+  border: 2px solid var(--bg);
+  margin-top: 6px;
+  box-shadow: 0 0 8px var(--cyan);
+  flex-shrink: 0;
+}
+.tl-dot.last { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+.tl-line {
+  width: 1px;
+  background: var(--border);
+  align-self: stretch;
+  margin: 14px auto 0;
+}
+.tl-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-bottom: 20px;
+}
+.tl-time { font-size: 11px; color: var(--cyan); letter-spacing: .1em; }
+.tl-event { font-size: 12px; color: #5a7a9a; }
+
+.energy-bar-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+}
+.energy-bar-label {
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: #1a3050;
+  margin-bottom: 12px;
+}
+.energy-bar-outer {
+  position: relative;
+  height: 20px;
+  background: #04101f;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.energy-bar-inner {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #003366 0%, #0044aa 40%, var(--cyan) 75%, #ffffff 88%, #ffaa00 95%, #003366 100%);
+  border-radius: 4px;
+  animation: energyPulse 3s ease-in-out infinite;
+}
+.energy-bar-peak {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 75%; width: 12%;
+  background: rgba(255,255,255,.08);
+  animation: peakPulse 3s ease-in-out infinite;
+}
+@keyframes energyPulse { 0%,100%{opacity:.6;} 50%{opacity:1;} }
+@keyframes peakPulse { 0%,100%{opacity:.3;} 50%{opacity:.8;} }
+.energy-bar-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #1a3050;
+  letter-spacing: .08em;
+}
+
+/* ── SEAL SECTION ── */
+.seal-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+@media (max-width: 720px) { .seal-grid { grid-template-columns: 1fr; } }
+
+.seal-vis {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 2px;
+}
+.seal-layer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 6px;
+}
+.sl-name { font-size: 10px; color: #ccc; letter-spacing: .04em; }
+.sl-thick { font-size: 10px; color: #888; }
+.seal-arrow {
+  text-align: center;
+  font-size: 10px;
+  color: #1a3050;
+  letter-spacing: .1em;
+  padding: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.seal-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+.seal-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.seal-dot { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; margin-top: 2px; }
+.seal-card-name { font-size: 11px; color: #a8c0d8; margin-bottom: 4px; letter-spacing: .04em; }
+.seal-card-role { font-size: 11px; color: #446688; line-height: 1.5; }
+
+.seal-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.seal-stat { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.ss-val { font-size: 14px; font-weight: 700; }
+.ss-val.cyan { color: var(--cyan); }
+.ss-val.amber { color: var(--amber); }
+.ss-label { font-size: 8px; letter-spacing: .1em; color: #1a3050; text-align: center; }
+
+.seal-note, .nose-note {
+  font-size: 12px;
+  color: #2a4060;
+  line-height: 1.8;
+  padding: 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 6px;
+}
+
+/* ── NOSE SECTION ── */
+.nose-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+@media (max-width: 720px) { .nose-grid { grid-template-columns: 1fr; } }
+
+.nose-layers-vis { display: flex; flex-direction: column; gap: 8px; }
+.nl-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fadeSlide .4s ease both;
+}
+@keyframes fadeSlide { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+.nl-color { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+.nl-bar {
+  flex: 1;
+  height: 36px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  transition: width .3s ease;
+}
+.nl-name { font-size: 11px; color: #a8c0d8; }
+.nl-thick { font-size: 10px; color: #556688; }
+
+.nose-cards { display: flex; flex-direction: column; gap: 10px; }
+.nose-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.nc-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; margin-top: 3px; }
+.nc-name { font-size: 11px; color: #a8c0d8; margin-bottom: 3px; letter-spacing: .04em; }
+.nc-role { font-size: 11px; color: #3a5a78; line-height: 1.5; }
+
+/* ── SPECS TABLE ── */
+.specs-table {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.spec-row:last-child { border-bottom: none; }
+.spec-row span:first-child { color: #334466; }
+.spec-row span:last-child { color: #6a8aaa; text-align: right; }
+.spec-row span.cyan { color: var(--cyan); }
+.spec-row span.amber { color: var(--amber); }
+
+/* ── BACK NAV ── */
+.back-nav {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+  border-top: 1px solid var(--border);
+}
+.back-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+}
+.back-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .2s;
+}
+.back-card:hover { border-color: #1a3a5c; }
+.back-icon { font-size: 28px; }
+.back-label { font-size: 13px; color: #a8c0d8; margin-bottom: 4px; }
+.back-sub { font-size: 11px; color: #334466; }
+
+.footer-note {
+  text-align: center;
+  font-size: 11px;
+  color: #1a3050;
+  line-height: 1.8;
+}
+.footer-note a { color: #2a5080; }
+.footer-note a:hover { color: var(--cyan); }
+</style>
